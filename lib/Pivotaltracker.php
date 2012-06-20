@@ -20,15 +20,6 @@ class PivotalTracker {
         return (string) $xml->guid;
     }
 
-    public function getStoriesByFilter($token, $projectId, $filter) {
-        $url = $this->baseurl . 'projects/' . $projectId . '/stories?filter=' . $filter;
-        $xml = $this->curl($url);
-        if($xml == FALSE)
-            return FALSE;
-        
-        return (array)$xml->stories;
-    }
-
     private function curl($url){
         $ch = curl_init($url);
 
