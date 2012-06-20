@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `airtimer` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `airtimer`;
 -- MySQL dump 10.13  Distrib 5.5.24, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: airtimer
@@ -26,21 +28,12 @@ CREATE TABLE `timelog` (
   `log_id` int(11) NOT NULL AUTO_INCREMENT,
   `projectId` int(11) DEFAULT NULL,
   `storyId` int(11) DEFAULT NULL,
-  `user_id` int(11) DEFAULT NULL COMMENT 'user_id na tabela de users (nao e o membershipid)',
+  `membership_id` int(11) DEFAULT NULL COMMENT 'membership at pivotaltracker',
   `action_type` tinyint(4) DEFAULT NULL COMMENT '1 pra started\n0 pra paused ou finished',
   `action_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`log_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `timelog`
---
-
-LOCK TABLES `timelog` WRITE;
-/*!40000 ALTER TABLE `timelog` DISABLE KEYS */;
-/*!40000 ALTER TABLE `timelog` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `users`
@@ -56,9 +49,12 @@ CREATE TABLE `users` (
   `pivotal_token` varchar(120) DEFAULT NULL,
   `pivotal_membership_id` int(8) DEFAULT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Dumping events for database 'airtimer'
+--
 
 --
 -- Dumping routines for database 'airtimer'
@@ -73,4 +69,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-06-19 13:46:19
+-- Dump completed on 2012-06-19 23:17:38

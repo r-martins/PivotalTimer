@@ -27,7 +27,29 @@ class AirTimer
 		$this->showJson(true,array('token' => $this->pivotalToken, 'membershipId' => (string)$pivotal->membershipId));
 	}
 
-	
+	public function logAction($args)
+        {
+            $this->_checkCurl();
+            
+            $this->pivotalToken = $args['token'];
+            $membershipId = (int)$args['membershipId'];
+            $storyId = (int)$args['storyId'];
+            $projectId = (int)$args['projectId'];
+            $actionType = ($args['actionType'] == 'start')?1:0;
+            
+            $pivotal = new PivotalTracker();
+            
+            $dbh = $this->_getDbh();
+		$sqlInsertLog = "INSERT INTO timelog (projectId,storyId,membership_id,action_type) VALUES('%s','%s','%s','%s');";
+		$sqlInsertLog = sprintf($sqlInsertLog,$projectId,$storyId,$membershipId,$actionType);
+		
+		$inserted = $dbh->exec($sqlInsertLog);
+		if($inserted == 0){
+			$this->exception('Insert failed.');
+		}else{
+			$this->showJson(true,array('message' => 'Logged Successfuly.', 'log_id' => $dbh->lastInsertId()));
+		}
+        }
 
 	public function showJson($success,$content){
 		$j = array_merge(array('success' =>$success), $content);
