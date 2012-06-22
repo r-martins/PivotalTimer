@@ -28,11 +28,12 @@ CREATE TABLE `timelog` (
   `log_id` int(11) NOT NULL AUTO_INCREMENT,
   `projectId` int(11) DEFAULT NULL,
   `storyId` int(11) DEFAULT NULL,
-  `membership_id` int(11) DEFAULT NULL COMMENT 'membership at pivotaltracker',
-  `action_type` tinyint(4) DEFAULT NULL COMMENT '1 pra started\n0 pra paused ou finished',
-  `action_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `membershipId` int(11) DEFAULT NULL COMMENT 'membership at pivotaltracker',
+  `actionType` tinyint(4) DEFAULT NULL COMMENT '1 pra started\n0 pra paused ou finished',
+  `actionTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `duration` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`log_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -49,7 +50,7 @@ CREATE TABLE `users` (
   `pivotal_token` varchar(120) DEFAULT NULL,
   `pivotal_membership_id` int(8) DEFAULT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,4 +70,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-06-19 23:17:38
+-- Dump completed on 2012-06-22 11:10:28

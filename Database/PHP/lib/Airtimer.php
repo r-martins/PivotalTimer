@@ -40,16 +40,48 @@ class AirTimer
             $pivotal = new PivotalTracker();
             
             $dbh = $this->_getDbh();
-		$sqlInsertLog = "INSERT INTO timelog (projectId,storyId,membership_id,action_type) VALUES('%s','%s','%s','%s');";
-		$sqlInsertLog = sprintf($sqlInsertLog,$projectId,$storyId,$membershipId,$actionType);
-		
-		$inserted = $dbh->exec($sqlInsertLog);
-		if($inserted == 0){
-			$this->exception('Insert failed.');
-		}else{
-			$this->showJson(true,array('message' => 'Logged Successfuly.', 'log_id' => $dbh->lastInsertId()));
-		}
+	    //check if the request is duplicated
+	    $selectLastTime = "SELECT actionTime, actionType FROM timelog WHERE storyId=:storyId AND projectId=:projectId AND membershipId=:membershipId ORDER BY actionTime DESC LIMIT 1";
+	    $sth = $dbh->prepare($selectLastTime, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+	    $sth->execute(array(':storyId' => $args['storyId'], ':projectId' => $args['projectId'], ':membershipId' => $args['membershipId']));
+	    $result = $sth->fetchAll();
+	    if(isset($result[0]['actionType']) AND $result[0]['actionType'] == $actionType){
+		$msg = sprintf('The story is already %s.', ($actionType==0)?'stopped':'started');
+		$this->exception($msg);
+	    }else if($actionType==0 AND !isset($result[0])){
+		$this->exception('This story has not been started.');
+	    }
+	    
+	    $sqlInsertLog = "INSERT INTO timelog (projectId,storyId,membershipId,actionType) VALUES('%s','%s','%s','%s');";
+	    $sqlInsertLog = sprintf($sqlInsertLog,$projectId,$storyId,$membershipId,$actionType);
+
+	    $inserted = $dbh->exec($sqlInsertLog);
+	    if($inserted == 0){
+		    $this->exception('Insert failed.');
+	    }else{
+		    if($actionType==0){
+			$this->updateDuration($args);
+		    }
+		    $this->showJson(true,array('message' => 'Logged Successfuly.', 'log_id' => $dbh->lastInsertId()));
+	    }
         }
+	
+	public function updateDuration($args){
+	    $dbh = $this->_getDbh();
+	    $stop_log_id = (isset($args['logId']))?$args['logId']:$dbh->lastInsertId();
+	    $selectLastTime = "SELECT actionTime, actionType, duration FROM timelog WHERE storyId=:storyId AND projectId=:projectId AND membershipId=:membershipId AND actionType = 1 ORDER BY actionTime DESC LIMIT 1";
+
+	    $sth = $dbh->prepare($selectLastTime, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+	    $sth->execute(array(':storyId' => $args['storyId'], ':projectId' => $args['projectId'], ':membershipId' => $args['membershipId']));
+	    
+	    $result = $sth->fetchAll();
+	    $last_action_time = $result[0]['actionTime'];
+	    
+	    $sqlUpdate = "UPDATE timelog SET duration = CURRENT_TIMESTAMP-TIMESTAMP('%s') WHERE log_id=%s";
+	    $sqlUpdate = sprintf($sqlUpdate,$last_action_time,$stop_log_id);
+	    $affr = $dbh->exec($sqlUpdate);
+	    return ($affr);
+	}
 
 	public function showJson($success,$content){
 		$j = array_merge(array('success' =>$success), $content);
