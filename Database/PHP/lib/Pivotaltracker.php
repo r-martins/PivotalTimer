@@ -9,6 +9,8 @@ class PivotalTracker {
 
     public function getUserToken($user, $pass) {
         $url = $this->baseurl . 'tokens/active';
+        $this->user = $user;
+        $this->pass = $pass;
         $xml = $this->curl($url);
         
         if($xml == FALSE)
@@ -31,9 +33,9 @@ class PivotalTracker {
 
         curl_setopt($ch, CURLOPT_HTTPGET, 1);
 
-        $do_auth = !empty($user) && !empty($pass);
+        $do_auth = isset($this->user) && isset($this->pass) && !empty($this->user) && !empty($this->pass);
         if ($do_auth) {
-            curl_setopt($ch, CURLOPT_USERPWD, $user . ':' . $pass);
+            curl_setopt($ch, CURLOPT_USERPWD, $this->user . ':' . $this->pass);
         }
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
